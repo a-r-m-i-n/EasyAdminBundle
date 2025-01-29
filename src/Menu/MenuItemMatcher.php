@@ -188,7 +188,17 @@ class MenuItemMatcher implements MenuItemMatcherInterface
                 $menuItemDto->setSubItems($this->doMarkSelectedPrettyUrlsMenuItem($subItems, $request));
             }
 
-            if ($menuItemDto->getLinkUrl() === $normalizedCurrentUrl) {
+            // Remove host part from menu item link URL
+            $urlParts = parse_url($menuItemDto->getLinkUrl());
+            $linkUrlWithoutHost = $urlParts['path'];
+            if (\array_key_exists('query', $urlParts)) {
+                $linkUrlWithoutHost .= '?'.$urlParts['query'];
+            }
+            if (\array_key_exists('fragment', $urlParts)) {
+                $linkUrlWithoutHost .= '#'.$urlParts['fragment'];
+            }
+
+            if ($linkUrlWithoutHost === $normalizedCurrentUrl) {
                 $menuItemDto->setSelected(true);
 
                 return $menuItems;
